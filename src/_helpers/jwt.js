@@ -7,12 +7,12 @@ function jwt (user) {
 
 	return expressjwt({
 		secret: secret,
-		credentialsRequired: false,
+		credentialsRequired: true,
 		getToken: getToken
 	}).unless({
 		path: [
-			'/users/login',
-			'/users/register'
+			'/login',
+			'/register'
 		]
 	});
 }
@@ -28,3 +28,5 @@ function getToken(req) {
 		return null;
 	};
 };
+
+module.exports = jwt;

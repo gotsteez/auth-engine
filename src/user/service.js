@@ -22,7 +22,8 @@ function register({ username, password, discordId }) {
 	console.log(user);
 	
 	user.save();
-	return jwt.sign(user, config.jwt.secret, { expiresIn: '1h' })
+	let token = jwt.sign(user, config.jwt.secret, { expiresIn: '1h' });
+	return token;
 }
 
 function login ({ username, password }) {
