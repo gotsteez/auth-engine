@@ -7,6 +7,6 @@ const userSchema = new Schema({
 	createdDate: { type: String, required: true, default: Date.now() }
 })
 
-userSchema.set('toJson', { virutals: "None" })
+userSchema.set('toJson', { virtuals: "None" })
 
 module.exports= mongoose.model("User",userSchema);

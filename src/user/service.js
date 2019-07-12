@@ -10,36 +10,34 @@ module.exports ={
 	login
 }
 
-function register({ username, password }) {
-	// handle if username/password in route 
-	if (!discordId) {
-		discordId = null;
-	};
+async function register({ username, password }) {
+  // handle if username/password in route 
+  let person;
 
-	const person = User.findOne({ username: username });
-	if (!person) {
-		throw "User Already Exists"
-	}
+  try {
+    person = await User.findOne({ username: username });
+  } catch (e) {
+    console.error(e);
+    throw 'Error connecting to database';
+  }
+
+  if (person) {
+    throw "User Already Exists"
+  }
 	
 	const salt = bcrypt.genSaltSync(10);
-	const hash = bcrypt.hashSync(password, salt);
+  const hash = bcrypt.hashSync(password, salt);
+  
+  const newUser = new User({ username, hash });
 
-	let user = {};
-	try {
-		user = new User({ username: username, hash: hash });
-	}
-	catch (MongoError) {
-		throw MongoError
-	}
+  try {
+    await newUser.save();
+  } catch (e) {
+    console.error(e);
+    throw 'UserIsAlreadyMade';
+  }
 
-	try {
-		user.save();
-	} 
-	catch (MongoError) {
-		throw "UserIsAlreadyMade"
-	}
-
-	let token = jwt.sign(user.toJSON(), config.jwt.secret, { expiresIn: '1h' });
+	let token = jwt.sign(newUser.toJSON(), config.jwt.secret, { expiresIn: '1h' });
 	return token;
 }
 

@@ -1,6 +1,8 @@
 const express = require('express');
 const userService = require('./service');
 const bodyParser = require('body-parser');
+const db = require('../_helpers/db');
+const User = db.User;
 
 const router = express.Router();
 
@@ -14,27 +16,24 @@ router.get('/church', (req, res) => {
 });
 
 router.route('/register')
-	.post((req, res) => {
-		console.log(req.body);
-		
+	.post(async (req, res) => {
 		if (!req.body.username || !req.body.password){
 			res.status(400).json({ 
 				success: false,
 				error: "No username or password"
 			});
-			throw "Incorrect parameters"
-		};
+    };
+    
+    debugger;
 
 		let token;
 		try {
-			token = userService.register(req.body);
-		}
-		catch (err) {
-			res.status(400).json({
+			token = await userService.register(req.body);
+		} catch (err) {
+			return res.status(400).json({
 				success: false,
 				message:err
 			});
-			throw err
 		};
 
 		res.cookie('Information', token, {
