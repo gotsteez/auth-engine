@@ -10,7 +10,7 @@ module.exports ={
 	login
 }
 
-function register({ username, password, discordId }) {
+function register({ username, password }) {
 	// handle if username/password in route 
 	if (!discordId) {
 		discordId = null;
@@ -26,7 +26,7 @@ function register({ username, password, discordId }) {
 
 	let user = {};
 	try {
-		user = new User({ username: username, hash: hash, discordId: discordId });
+		user = new User({ username: username, hash: hash });
 	}
 	catch (MongoError) {
 		throw MongoError
