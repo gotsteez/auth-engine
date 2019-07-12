@@ -1,28 +1,45 @@
-const fs = require('fs');
-const path = require('path');
-const config = fs.readFileSync(path.join(__dirname, '..', "config.json"))
+const config = require('../config.json')
 
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const db = require('../_helpers/db');
 const User = db.User;
 
+module.exports ={
+	register,
+	login
+}
 
 function register({ username, password, discordId }) {
 	// handle if username/password in route 
-
 	if (!discordId) {
 		discordId = null;
 	};
 
+	const person = User.findOne({ username: username });
+	if (!person) {
+		throw "User Already Exists"
+	}
+	
 	const salt = bcrypt.genSaltSync(10);
 	const hash = bcrypt.hashSync(password, salt);
 
-	const user = new User({ username: username, hash: hash, discordId: discordId })
-	console.log(user);
-	
-	user.save();
-	let token = jwt.sign(user, config.jwt.secret, { expiresIn: '1h' });
+	let user = {};
+	try {
+		user = new User({ username: username, hash: hash, discordId: discordId });
+	}
+	catch (MongoError) {
+		throw MongoError
+	}
+
+	try {
+		user.save();
+	} 
+	catch (MongoError) {
+		throw "UserIsAlreadyMade"
+	}
+
+	let token = jwt.sign(user.toJSON(), config.jwt.secret, { expiresIn: '1h' });
 	return token;
 }
 
